@@ -1,0 +1,68 @@
+{% extends 'store/base.html' %}
+{% block title %}Register — NOVA{% endblock %}
+{% block extra_head %}
+<style>
+  .auth-page { display: flex; justify-content: center; padding: 4rem 1rem; }
+  .auth-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2.5rem;
+    width: 100%; max-width: 500px;
+  }
+  .auth-logo { font-family: var(--font-display); font-size: 2.5rem; text-align: center; margin-bottom: 2rem; }
+  .auth-logo span { color: var(--accent); }
+  .auth-box h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: .5rem; }
+  .auth-box p { color: var(--muted); font-size: 14px; margin-bottom: 2rem; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-full { grid-column: 1/-1; }
+  .auth-submit {
+    width: 100%; padding: 12px;
+    background: var(--accent); color: #000;
+    border: none; border-radius: var(--radius);
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    transition: background .2s; margin-top: .5rem;
+  }
+  .auth-submit:hover { background: #d4eb35; }
+  .auth-link { text-align: center; margin-top: 1.5rem; font-size: 14px; color: var(--muted); }
+  .auth-link a { color: var(--accent); font-weight: 600; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-box">
+    <div class="auth-logo">NOV<span>A</span></div>
+    <h1>Create your account</h1>
+    <p>Join NOVA to start shopping premium products.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name</label>
+          <input class="form-control" type="text" name="first_name" placeholder="John" autofocus/>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input class="form-control" type="text" name="last_name" placeholder="Doe"/>
+        </div>
+        <div class="form-group form-full">
+          <label>Username *</label>
+          <input class="form-control" type="text" name="username" placeholder="johndoe123" required/>
+        </div>
+        <div class="form-group form-full">
+          <label>Email *</label>
+          <input class="form-control" type="email" name="email" placeholder="john@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input class="form-control" type="password" name="password" placeholder="Min 6 chars" required/>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password *</label>
+          <input class="form-control" type="password" name="password2" placeholder="Repeat password" required/>
+        </div>
+      </div>
+      <button type="submit" class="auth-submit">Create Account →</button>
+    </form>
+    <div class="auth-link">Already have an account? <a href="/login/">Sign In</a></div>
+  </div>
+</div>
+{% endblock %}

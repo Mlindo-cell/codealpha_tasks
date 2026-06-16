@@ -1,0 +1,179 @@
+{% extends 'store/base.html' %}
+{% block title %}Checkout — NOVA{% endblock %}
+
+{% block extra_head %}
+<style>
+  .checkout-layout {
+    display: grid; grid-template-columns: 1fr 400px; gap: 2rem;
+    padding: 2rem 0;
+  }
+  .checkout-form {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2rem;
+  }
+  .checkout-form h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem; margin-bottom: 1.5rem;
+    padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-full { grid-column: 1/-1; }
+
+  .order-review {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    height: fit-content; position: sticky; top: 80px;
+  }
+  .order-review h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .checkout-item {
+    display: flex; gap: 1rem; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .checkout-item:last-of-type { border-bottom: none; }
+  .checkout-item img {
+    width: 52px; height: 52px;
+    border-radius: var(--radius); object-fit: cover;
+    border: 1px solid var(--border);
+  }
+  .checkout-item-info { flex: 1; }
+  .checkout-item-name { font-size: 13px; font-weight: 600; }
+  .checkout-item-sub { font-size: 12px; color: var(--muted); }
+  .checkout-item-price { font-family: var(--font-mono); font-size: 14px; }
+
+  .total-section {
+    margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .total-row {
+    display: flex; justify-content: space-between;
+    font-size: 14px; margin-bottom: 8px;
+  }
+  .total-row.grand {
+    font-size: 1.3rem; font-weight: 700;
+    margin-top: .5rem; padding-top: .5rem;
+    border-top: 1px solid var(--border);
+  }
+  .total-row.grand span:last-child {
+    font-family: var(--font-mono); color: var(--accent);
+  }
+
+  .place-order-btn {
+    width: 100%; padding: 15px;
+    background: var(--accent); color: #000;
+    border: none; border-radius: var(--radius);
+    font-weight: 700; font-size: 16px; cursor: pointer;
+    margin-top: 1.5rem; transition: background .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .place-order-btn:hover { background: #d4eb35; }
+
+  @media (max-width: 900px) {
+    .checkout-layout { grid-template-columns: 1fr; }
+    .order-review { position: static; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Checkout</h1>
+    <p>Complete your order details below</p>
+  </div>
+
+  <div class="checkout-layout">
+    <!-- Form -->
+    <div class="checkout-form">
+      <h2>Shipping Information</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input class="form-control" type="text" value="{{ user.first_name }}" readonly style="opacity:.6"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input class="form-control" type="text" value="{{ user.last_name }}" readonly style="opacity:.6"/>
+          </div>
+          <div class="form-group form-full">
+            <label>Email</label>
+            <input class="form-control" type="email" value="{{ user.email }}" readonly style="opacity:.6"/>
+          </div>
+          <div class="form-group form-full">
+            <label>Phone Number</label>
+            <input class="form-control" type="tel" name="phone" value="{{ profile.phone }}" placeholder="+1 234 567 8900"/>
+          </div>
+          <div class="form-group form-full">
+            <label>Street Address *</label>
+            <input class="form-control" type="text" name="address" value="{{ profile.address }}" placeholder="123 Main Street, Apt 4B" required/>
+          </div>
+          <div class="form-group">
+            <label>City *</label>
+            <input class="form-control" type="text" name="city" value="{{ profile.city }}" placeholder="New York" required/>
+          </div>
+          <div class="form-group">
+            <label>Postal Code *</label>
+            <input class="form-control" type="text" name="postal_code" placeholder="10001" required/>
+          </div>
+          <div class="form-group form-full">
+            <label>Country *</label>
+            <select class="form-control" name="country" required>
+              <option value="">Select country…</option>
+              <option {% if profile.country == 'United States' %}selected{% endif %}>United States</option>
+              <option {% if profile.country == 'United Kingdom' %}selected{% endif %}>United Kingdom</option>
+              <option {% if profile.country == 'Canada' %}selected{% endif %}>Canada</option>
+              <option {% if profile.country == 'Australia' %}selected{% endif %}>Australia</option>
+              <option {% if profile.country == 'Germany' %}selected{% endif %}>Germany</option>
+              <option {% if profile.country == 'France' %}selected{% endif %}>France</option>
+              <option>South Africa</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group form-full">
+            <label>Order Notes (optional)</label>
+            <textarea class="form-control" name="notes" placeholder="Special delivery instructions…"></textarea>
+          </div>
+        </div>
+
+        <h2 style="margin-top:2rem">Payment</h2>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:14px;color:var(--muted)">
+          <i class="fas fa-lock" style="color:var(--accent)"></i>
+          This is a demo store. No real payment is processed.
+          <br/>In production, integrate Stripe or PayPal here.
+        </div>
+
+        <button type="submit" class="place-order-btn" style="margin-top:2rem">
+          <i class="fas fa-check-circle"></i> Place Order — ${{ total }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Order Review -->
+    <div class="order-review">
+      <h2>Your Order</h2>
+      {% for item in items %}
+        <div class="checkout-item">
+          {% if item.product.display_image %}
+            <img src="{{ item.product.display_image }}" alt="{{ item.product.name }}"/>
+          {% endif %}
+          <div class="checkout-item-info">
+            <div class="checkout-item-name">{{ item.product.name }}</div>
+            <div class="checkout-item-sub">Qty: {{ item.qty }}</div>
+          </div>
+          <div class="checkout-item-price">${{ item.subtotal }}</div>
+        </div>
+      {% endfor %}
+      <div class="total-section">
+        <div class="total-row"><span style="color:var(--muted)">Subtotal</span><span>${{ total }}</span></div>
+        <div class="total-row"><span style="color:var(--muted)">Shipping</span><span style="color:#4cda85">Free</span></div>
+        <div class="total-row grand"><span>Total</span><span>${{ total }}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

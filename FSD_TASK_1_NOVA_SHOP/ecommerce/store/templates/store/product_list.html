@@ -1,0 +1,115 @@
+{% extends 'store/base.html' %}
+{% block title %}Shop — NOVA{% endblock %}
+
+{% block extra_head %}
+<style>
+  .shop-layout {
+    display: grid; grid-template-columns: 240px 1fr; gap: 2rem;
+    padding: 2rem 0;
+  }
+  .sidebar {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    height: fit-content; position: sticky; top: 80px;
+  }
+  .sidebar h3 {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: .15em; color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .sidebar-cats { list-style: none; }
+  .sidebar-cats li a {
+    display: block; padding: 7px 10px;
+    border-radius: var(--radius);
+    font-size: 14px; font-weight: 500;
+    transition: all .15s;
+    color: var(--muted);
+  }
+  .sidebar-cats li a:hover,
+  .sidebar-cats li a.active {
+    background: var(--bg3); color: var(--text);
+  }
+  .sidebar-cats li a.active { border-left: 3px solid var(--accent); padding-left: 7px; }
+  .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+
+  .shop-main {}
+  .shop-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  .shop-toolbar p { color: var(--muted); font-size: 14px; }
+  .sort-select {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 12px;
+    border-radius: var(--radius); font-size: 14px; cursor: pointer;
+  }
+  .products-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+  }
+  .empty-state {
+    grid-column: 1/-1; text-align: center;
+    padding: 4rem 2rem; color: var(--muted);
+  }
+  .empty-state i { font-size: 3rem; margin-bottom: 1rem; }
+
+  @media (max-width: 900px) {
+    .shop-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>{% if query %}Search: "{{ query }}"{% elif selected_category %}{{ selected_category|title }}{% else %}All Products{% endif %}</h1>
+    <p>{{ products|length }} product{{ products|length|pluralize }} found</p>
+  </div>
+
+  <div class="shop-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h3>Categories</h3>
+      <ul class="sidebar-cats">
+        <li><a href="/products/" class="{% if not selected_category %}active{% endif %}">All Products</a></li>
+        {% for cat in categories %}
+          <li>
+            <a href="/products/?category={{ cat.slug }}"
+               class="{% if selected_category == cat.slug %}active{% endif %}">
+              {{ cat.name }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+      <hr class="sidebar-divider"/>
+      <h3>Sort By</h3>
+      <form method="get">
+        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}"/>{% endif %}
+        {% if query %}<input type="hidden" name="q" value="{{ query }}"/>{% endif %}
+        <select name="sort" class="sort-select" style="width:100%" onchange="this.form.submit()">
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+          <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A-Z</option>
+        </select>
+      </form>
+    </aside>
+
+    <!-- Products -->
+    <div class="shop-main">
+      <div class="products-grid">
+        {% for product in products %}
+          {% include 'store/_product_card.html' %}
+        {% empty %}
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No products found</h3>
+            <p>Try a different search or category.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

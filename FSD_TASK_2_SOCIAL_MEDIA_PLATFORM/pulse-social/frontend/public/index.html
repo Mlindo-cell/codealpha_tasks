@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+
+<!-- ══ AUTH ══════════════════════════════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-glow"></div>
+  <div class="auth-card">
+    <div class="logo-big">Pulse</div>
+    <p class="auth-tagline">Share your world</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="login">Sign In</button>
+      <button class="tab-btn" data-tab="register">Create Account</button>
+    </div>
+
+    <!-- LOGIN -->
+    <form id="login-form" class="auth-form">
+      <div class="form-field">
+        <label>Username or Email</label>
+        <input type="text" name="login" placeholder="Enter username or email" required autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div class="form-error" id="login-error"></div>
+      <button type="submit" class="btn-primary full">Sign In</button>
+      <p class="demo-hint">Demo: <strong>alex</strong> / <strong>password123</strong></p>
+    </form>
+
+    <!-- REGISTER -->
+    <form id="register-form" class="auth-form" style="display:none">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Display Name</label>
+          <input type="text" name="name" placeholder="Your Name" required>
+        </div>
+        <div class="form-field">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="handle" required>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-field">
+        <label>Bio</label>
+        <textarea name="bio" placeholder="Tell the world about yourself…" rows="2"></textarea>
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Min. 6 characters" required autocomplete="new-password">
+      </div>
+      <div class="form-error" id="reg-error"></div>
+      <button type="submit" class="btn-primary full">Create Account</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ APP ════════════════════════════════════════════════════════════════════ -->
+<div id="app" style="display:none">
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="topnav-inner">
+      <a class="logo" href="#" data-page="feed">Pulse</a>
+      <div class="search-bar">
+        <span class="search-ic">⌕</span>
+        <input type="text" id="global-search" placeholder="Search Pulse…" autocomplete="off">
+        <div class="search-dropdown" id="search-dropdown"></div>
+      </div>
+      <div class="topnav-right">
+        <button class="nav-icon-btn" data-page="messages" title="Messages">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-badge" id="msg-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-icon-btn" data-page="notifications" title="Notifications">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="nav-badge" id="notif-badge" style="display:none">0</span>
+        </button>
+        <div class="topnav-avatar" id="topnav-avatar" data-page="my-profile"></div>
+        <button class="btn-ghost sm" id="logout-btn">Sign out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- LAYOUT -->
+  <div class="app-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar left-sidebar">
+      <nav class="sidenav">
+        <a class="sidenav-item active" data-page="feed">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+        </a>
+        <a class="sidenav-item" data-page="explore">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Explore</span>
+        </a>
+        <a class="sidenav-item" data-page="notifications">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Notifications</span>
+          <span class="sidenav-badge" id="side-notif-badge" style="display:none"></span>
+        </a>
+        <a class="sidenav-item" data-page="bookmarks">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span>Bookmarks</span>
+        </a>
+        <a class="sidenav-item" data-page="messages">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Messages</span>
+        </a>
+        <a class="sidenav-item" data-page="my-profile">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+      </nav>
+
+      <button class="compose-btn" id="compose-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Post
+      </button>
+
+      <!-- Compact profile -->
+      <div class="sidebar-profile" id="sidebar-profile"></div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- HOME FEED -->
+      <div class="page active" id="page-feed">
+        <div class="page-header"><h1>Home</h1></div>
+        <div class="inline-compose" id="inline-compose"></div>
+        <div id="feed-list"></div>
+        <button class="load-more-btn" id="feed-load-more" style="display:none">Load more</button>
+      </div>
+
+      <!-- EXPLORE -->
+      <div class="page" id="page-explore">
+        <div class="page-header"><h1>Explore</h1></div>
+        <div id="explore-list"></div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="page" id="page-notifications">
+        <div class="page-header">
+          <h1>Notifications</h1>
+          <button class="btn-ghost sm" id="mark-all-read-btn">Mark all read</button>
+        </div>
+        <div id="notifications-list"></div>
+      </div>
+
+      <!-- BOOKMARKS -->
+      <div class="page" id="page-bookmarks">
+        <div class="page-header"><h1>Bookmarks</h1></div>
+        <div id="bookmarks-list"></div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="page" id="page-messages">
+        <div class="page-header"><h1>Messages</h1></div>
+        <div class="messages-layout">
+          <div class="conv-list" id="conv-list"></div>
+          <div class="msg-pane" id="msg-pane">
+            <div class="msg-empty">Select a conversation or start a new one</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div id="profile-content"></div>
+      </div>
+
+      <!-- SEARCH RESULTS -->
+      <div class="page" id="page-search">
+        <div class="page-header"><h1 id="search-title">Search</h1></div>
+        <div id="search-results"></div>
+      </div>
+
+      <!-- HASHTAG -->
+      <div class="page" id="page-hashtag">
+        <div class="page-header"><h1 id="hashtag-title">#tag</h1></div>
+        <div id="hashtag-list"></div>
+      </div>
+
+      <!-- SINGLE POST -->
+      <div class="page" id="page-post">
+        <div class="page-header">
+          <button class="back-btn" id="post-back-btn">← Back</button>
+          <h1>Post</h1>
+        </div>
+        <div id="single-post-content"></div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar right-sidebar">
+      <div class="widget">
+        <h3 class="widget-title">Who to follow</h3>
+        <div id="suggested-users"></div>
+      </div>
+      <div class="widget">
+        <h3 class="widget-title">Trending</h3>
+        <div id="trending-tags"></div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ══ COMPOSE MODAL ══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="compose-modal">
+  <div class="modal compose-modal-inner">
+    <div class="modal-header">
+      <button class="modal-close" id="compose-close">✕</button>
+    </div>
+    <div class="compose-full">
+      <div class="compose-avatar" id="compose-modal-avatar"></div>
+      <div class="compose-right">
+        <textarea id="compose-text" placeholder="What's on your mind?" maxlength="500"></textarea>
+        <div class="compose-toolbar">
+          <label class="toolbar-icon" for="compose-media-input" title="Add image">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <input type="file" id="compose-media-input" accept="image/*" style="display:none">
+          </label>
+          <span class="char-counter" id="compose-counter">500</span>
+          <button class="btn-primary" id="submit-post-btn">Post</button>
+        </div>
+        <div id="compose-preview"></div>
+        <div class="form-error" id="compose-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT PROFILE MODAL ════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-profile-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Edit Profile</h2>
+      <button class="modal-close" id="edit-profile-close">✕</button>
+    </div>
+    <form id="edit-profile-form">
+      <div class="form-field"><label>Display Name</label><input type="text" name="name" required></div>
+      <div class="form-field"><label>Bio</label><textarea name="bio" rows="3"></textarea></div>
+      <div class="form-field"><label>Website</label><input type="url" name="website" placeholder="https://"></div>
+      <div class="form-field"><label>Location</label><input type="text" name="location" placeholder="City, Country"></div>
+      <div class="form-error" id="edit-profile-error"></div>
+      <button type="submit" class="btn-primary full">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ IMAGE LIGHTBOX ════════════════════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightbox-close">✕</div>
+  <img id="lightbox-img" src="" alt="Full size image">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/router.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

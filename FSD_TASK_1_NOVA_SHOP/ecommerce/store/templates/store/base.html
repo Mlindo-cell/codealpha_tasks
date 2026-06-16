@@ -1,0 +1,352 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}NOVA Shop{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #e8ff3f;
+      --accent2: #ff6b35;
+      --white: #ffffff;
+      --radius: 4px;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; gap: 2rem;
+      height: 64px;
+    }
+
+    .navbar__logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+    }
+    .navbar__logo span { color: var(--accent); }
+
+    .navbar__search {
+      flex: 1; max-width: 400px;
+      display: flex; align-items: center;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .navbar__search input {
+      flex: 1; padding: 8px 14px;
+      background: transparent; border: none; color: var(--text);
+      font-size: 14px; outline: none;
+    }
+    .navbar__search button {
+      padding: 8px 14px; background: var(--accent); border: none;
+      color: #000; cursor: pointer; font-weight: 600;
+    }
+    .navbar__search button:hover { background: #d4eb35; }
+
+    .navbar__links {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .navbar__links a {
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      transition: color .2s;
+    }
+    .navbar__links a:hover { color: var(--text); }
+
+    .nav-cart {
+      position: relative;
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: var(--accent); color: #000;
+      border-radius: var(--radius);
+      font-weight: 600; font-size: 14px;
+      transition: background .2s;
+    }
+    .nav-cart:hover { background: #d4eb35; color: #000; }
+    .cart-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--accent2); color: #fff;
+      border-radius: 50%; width: 20px; height: 20px;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── MESSAGES ── */
+    .messages-bar {
+      padding: 12px 2rem;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .alert {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .alert-success { background: #0d2b1a; border: 1px solid #1e6b3f; color: #4cda85; }
+    .alert-error, .alert-warning { background: #2b0d0d; border: 1px solid #6b1e1e; color: #da4c4c; }
+    .alert-info { background: #0d1e2b; border: 1px solid #1e4d6b; color: #4ca8da; }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 4rem;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem 1.5rem;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2rem; margin-bottom: 2rem;
+    }
+    .footer-brand .logo {
+      font-family: var(--font-display);
+      font-size: 2rem; margin-bottom: 0.5rem;
+    }
+    .footer-brand .logo span { color: var(--accent); }
+    .footer-brand p { color: var(--muted); font-size: 14px; }
+    .footer-col h4 {
+      font-weight: 600; margin-bottom: 1rem;
+      font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    }
+    .footer-col a {
+      display: block; color: var(--muted); font-size: 14px;
+      margin-bottom: 8px; transition: color .2s;
+    }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--muted); font-size: 13px;
+    }
+
+    /* ── UTILITIES ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: var(--radius);
+      font-weight: 600; font-size: 14px; cursor: pointer;
+      transition: all .2s; border: none;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #d4eb35; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--text); }
+    .btn-danger { background: #c0392b; color: #fff; }
+    .btn-danger:hover { background: #a93226; }
+
+    .badge {
+      display: inline-block; padding: 3px 8px;
+      border-radius: 2px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .badge-sale { background: var(--accent2); color: #fff; }
+    .badge-new { background: var(--accent); color: #000; }
+    .badge-oos { background: var(--border); color: var(--muted); }
+
+    /* ── FORM STYLES ── */
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); border-radius: var(--radius);
+      font-size: 14px; transition: border-color .2s;
+    }
+    .form-control:focus {
+      outline: none; border-color: var(--accent);
+    }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    /* ── PAGE TITLE ── */
+    .page-header {
+      padding: 3rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: 3rem; letter-spacing: .03em;
+    }
+    .page-header p { color: var(--muted); margin-top: 0.5rem; }
+
+    /* ── STAR RATING ── */
+    .stars { color: var(--accent); font-size: 14px; }
+    .stars .empty { color: var(--border); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--accent); color: #000;
+      padding: 12px 20px; border-radius: var(--radius);
+      font-weight: 600; font-size: 14px;
+      transform: translateY(100px); opacity: 0;
+      transition: all .3s; z-index: 9999;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 0 1rem; gap: 1rem; }
+      .navbar__search { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="navbar__logo">NOV<span>A</span></a>
+
+  <form class="navbar__search" action="/products/" method="get">
+    <input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}"/>
+    <button type="submit"><i class="fas fa-search"></i></button>
+  </form>
+
+  <div class="navbar__links">
+    <a href="/products/">Shop</a>
+    {% if user.is_authenticated %}
+      <a href="/orders/">Orders</a>
+      <a href="/profile/">{{ user.first_name|default:user.username }}</a>
+      <a href="/logout/">Logout</a>
+    {% else %}
+      <a href="/login/">Login</a>
+      <a href="/register/">Register</a>
+    {% endif %}
+    <a href="/cart/" class="nav-cart">
+      <i class="fas fa-bag-shopping"></i> Cart
+      {% if cart_count %}<span class="cart-badge" id="cart-badge">{{ cart_count }}</span>{% endif %}
+    </a>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="messages-bar container">
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags|default:'info' }}">
+      <i class="fas fa-{% if msg.tags == 'success' %}check-circle{% elif msg.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+      {{ msg }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">NOV<span>A</span></div>
+        <p>Premium products, curated for you.<br>Fast shipping. Easy returns.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="/products/?category=electronics">Electronics</a>
+        <a href="/products/?category=clothing">Clothing</a>
+        <a href="/products/?category=books">Books</a>
+        <a href="/products/?category=home-kitchen">Home</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="/profile/">Profile</a>
+        <a href="/orders/">Orders</a>
+        <a href="/cart/">Cart</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <a href="#">Shipping Policy</a>
+        <a href="#">Returns</a>
+        <a href="#">Contact Us</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 NOVA Shop. All rights reserved.</span>
+      <span>Built with Django &amp; ❤️</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+  const CSRF = '{{ csrf_token }}';
+
+  function showToast(msg, duration = 2500) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  function updateBadge(count) {
+    let badge = document.getElementById('cart-badge');
+    const cart = document.querySelector('.nav-cart');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-badge';
+        badge.id = 'cart-badge';
+        cart.appendChild(badge);
+      }
+      badge.textContent = count;
+    } else if (badge) {
+      badge.remove();
+    }
+  }
+
+  async function addToCart(productId, qty = 1) {
+    const res = await fetch('/cart/add/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+      body: JSON.stringify({ product_id: productId, quantity: qty })
+    });
+    const data = await res.json();
+    if (data.success) {
+      updateBadge(data.cart_count);
+      showToast('✓ Added to cart!');
+    }
+  }
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

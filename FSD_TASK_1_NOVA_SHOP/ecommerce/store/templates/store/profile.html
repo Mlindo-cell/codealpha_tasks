@@ -1,0 +1,109 @@
+{% extends 'store/base.html' %}
+{% block title %}My Profile — NOVA{% endblock %}
+{% block extra_head %}
+<style>
+  .profile-layout { display: grid; grid-template-columns: 240px 1fr; gap: 2rem; padding: 2rem 0; }
+  .profile-sidebar {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    height: fit-content; text-align: center;
+  }
+  .profile-avatar {
+    width: 80px; height: 80px;
+    background: var(--accent); color: #000;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 2rem;
+    margin: 0 auto 1rem;
+  }
+  .profile-sidebar h3 { font-weight: 700; }
+  .profile-sidebar p { color: var(--muted); font-size: 13px; }
+  .sidebar-nav { margin-top: 1.5rem; text-align: left; }
+  .sidebar-nav a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: var(--radius);
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    transition: all .15s; margin-bottom: 4px;
+  }
+  .sidebar-nav a:hover, .sidebar-nav a.active {
+    background: var(--bg3); color: var(--text);
+  }
+  .profile-form {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2rem;
+  }
+  .profile-form h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem; margin-bottom: 1.5rem;
+    padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .save-btn {
+    padding: 12px 32px;
+    background: var(--accent); color: #000;
+    border: none; border-radius: var(--radius);
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    transition: background .2s;
+  }
+  .save-btn:hover { background: #d4eb35; }
+  @media (max-width: 768px) { .profile-layout { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>My Account</h1>
+  </div>
+  <div class="profile-layout">
+    <div class="profile-sidebar">
+      <div class="profile-avatar">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+      <h3>{{ user.get_full_name|default:user.username }}</h3>
+      <p>{{ user.email }}</p>
+      <div class="sidebar-nav">
+        <a href="/profile/" class="active"><i class="fas fa-user"></i> Profile</a>
+        <a href="/orders/"><i class="fas fa-box"></i> Orders</a>
+        <a href="/cart/"><i class="fas fa-bag-shopping"></i> Cart</a>
+        <a href="/logout/" style="color:#e74c3c"><i class="fas fa-right-from-bracket"></i> Logout</a>
+      </div>
+    </div>
+
+    <div class="profile-form">
+      <h2>Edit Profile</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input class="form-control" type="text" name="first_name" value="{{ user.first_name }}"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input class="form-control" type="text" name="last_name" value="{{ user.last_name }}"/>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Email</label>
+            <input class="form-control" type="email" name="email" value="{{ user.email }}"/>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Phone</label>
+            <input class="form-control" type="tel" name="phone" value="{{ profile.phone }}"/>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Address</label>
+            <input class="form-control" type="text" name="address" value="{{ profile.address }}"/>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input class="form-control" type="text" name="city" value="{{ profile.city }}"/>
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <input class="form-control" type="text" name="country" value="{{ profile.country }}"/>
+          </div>
+        </div>
+        <button type="submit" class="save-btn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

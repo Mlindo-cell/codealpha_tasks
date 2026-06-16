@@ -1,0 +1,284 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }} — NOVA{% endblock %}
+
+{% block extra_head %}
+<style>
+  .product-detail { padding: 3rem 0; }
+  .product-layout {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;
+  }
+  .product-gallery {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    aspect-ratio: 1;
+  }
+  .product-gallery img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .product-info {}
+  .product-info__cat {
+    font-size: 12px; text-transform: uppercase;
+    letter-spacing: .1em; color: var(--accent);
+    margin-bottom: .5rem;
+  }
+  .product-info h1 {
+    font-family: var(--font-display);
+    font-size: 2.8rem; line-height: 1; margin-bottom: 1rem;
+  }
+  .product-ratings {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: 1rem;
+  }
+  .product-price-row {
+    display: flex; align-items: baseline; gap: 1rem;
+    margin-bottom: 1.5rem; padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .product-price-big {
+    font-family: var(--font-mono);
+    font-size: 2.5rem; color: var(--accent);
+  }
+  .product-price-orig {
+    font-size: 1.2rem; color: var(--muted);
+    text-decoration: line-through;
+  }
+  .product-desc { color: var(--muted); line-height: 1.8; margin-bottom: 2rem; }
+
+  .qty-row {
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;
+  }
+  .qty-control {
+    display: flex; align-items: center;
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .qty-control button {
+    background: var(--bg3); border: none; color: var(--text);
+    padding: 8px 14px; cursor: pointer; font-size: 16px;
+    transition: background .2s;
+  }
+  .qty-control button:hover { background: var(--border); }
+  .qty-control input {
+    background: transparent; border: none; color: var(--text);
+    width: 50px; text-align: center; font-size: 15px; font-weight: 600;
+    padding: 8px 4px;
+  }
+  .product-actions { display: flex; gap: 1rem; }
+  .product-actions .btn { flex: 1; justify-content: center; padding: 14px; font-size: 15px; }
+
+  .product-meta {
+    margin-top: 1.5rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+    font-size: 13px; color: var(--muted);
+  }
+  .product-meta span strong { color: var(--text); }
+
+  /* Reviews */
+  .reviews-section { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .reviews-section h2 {
+    font-family: var(--font-display);
+    font-size: 2rem; margin-bottom: 1.5rem;
+  }
+  .review-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .review-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: .5rem;
+  }
+  .review-author { font-weight: 600; font-size: 14px; }
+  .review-date { color: var(--muted); font-size: 12px; }
+  .review-comment { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  .review-form {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    margin-top: 2rem;
+  }
+  .review-form h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+  .star-picker { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .star-picker input[type=radio] { display: none; }
+  .star-picker label { font-size: 1.5rem; cursor: pointer; color: var(--border); transition: color .1s; }
+  .star-picker label:hover,
+  .star-picker label.selected { color: var(--accent); }
+
+  .related-section { margin-top: 4rem; }
+  .related-section h2 {
+    font-family: var(--font-display);
+    font-size: 2rem; margin-bottom: 1.5rem;
+  }
+  .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+  @media (max-width: 800px) {
+    .product-layout { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container product-detail">
+  <!-- Breadcrumb -->
+  <div style="color:var(--muted);font-size:13px;margin-bottom:2rem">
+    <a href="/">Home</a> / <a href="/products/">Shop</a> /
+    {% if product.category %}<a href="/products/?category={{ product.category.slug }}">{{ product.category.name }}</a> / {% endif %}
+    {{ product.name }}
+  </div>
+
+  <div class="product-layout">
+    <!-- Gallery -->
+    <div class="product-gallery">
+      {% if product.display_image %}
+        <img src="{{ product.display_image }}" alt="{{ product.name }}"/>
+      {% else %}
+        <img src="https://via.placeholder.com/600x600/1a1a1a/444?text=No+Image" alt="{{ product.name }}"/>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div class="product-info">
+      <div class="product-info__cat">{{ product.category.name }}</div>
+      <h1>{{ product.name }}</h1>
+
+      <div class="product-ratings">
+        <div class="stars">
+          {% for i in "12345" %}
+            {% if forloop.counter <= avg_rating %}★{% else %}<span class="empty">★</span>{% endif %}
+          {% endfor %}
+        </div>
+        <span style="font-size:14px;color:var(--muted)">{{ avg_rating }} ({{ reviews|length }} reviews)</span>
+      </div>
+
+      <div class="product-price-row">
+        <span class="product-price-big">${{ product.price }}</span>
+        {% if product.original_price %}
+          <span class="product-price-orig">${{ product.original_price }}</span>
+          <span class="badge badge-sale">{{ product.discount_percent }}% OFF</span>
+        {% endif %}
+      </div>
+
+      <p class="product-desc">{{ product.description }}</p>
+
+      {% if product.stock > 0 %}
+        <div class="qty-row">
+          <div class="qty-control">
+            <button onclick="changeQty(-1)">−</button>
+            <input type="number" id="qty" value="1" min="1" max="{{ product.stock }}"/>
+            <button onclick="changeQty(1)">+</button>
+          </div>
+          <span style="font-size:13px;color:var(--muted)">{{ product.stock }} in stock</span>
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-primary" onclick="handleAdd()">
+            <i class="fas fa-bag-shopping"></i> Add to Cart
+          </button>
+          <a href="/checkout/" class="btn btn-outline">Buy Now →</a>
+        </div>
+      {% else %}
+        <div class="btn btn-outline" style="opacity:.5;cursor:not-allowed">Out of Stock</div>
+      {% endif %}
+
+      <div class="product-meta">
+        <span><strong>Category:</strong> {{ product.category.name }}</span>
+        <span><strong>SKU:</strong> NOVA-{{ product.id|stringformat:"04d" }}</span>
+        <span><strong>Status:</strong> {% if product.stock > 0 %}✅ In Stock{% else %}❌ Out of Stock{% endif %}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <div class="reviews-section">
+    <h2>Customer Reviews ({{ reviews|length }})</h2>
+
+    {% for review in reviews %}
+      <div class="review-card">
+        <div class="review-header">
+          <div>
+            <span class="review-author">{{ review.user.get_full_name|default:review.user.username }}</span>
+            <div class="stars" style="margin-top:4px">
+              {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}★{% else %}<span class="empty">★</span>{% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+        </div>
+        <p class="review-comment">{{ review.comment }}</p>
+      </div>
+    {% empty %}
+      <p style="color:var(--muted);font-size:14px">No reviews yet. Be the first!</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+      <div class="review-form">
+        <h3>{% if user_review %}Update Your Review{% else %}Write a Review{% endif %}</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="star-picker" id="star-picker">
+            {% for i in "12345" %}
+              <input type="radio" name="rating" id="s{{ forloop.counter }}" value="{{ forloop.counter }}"
+                {% if user_review and user_review.rating == forloop.counter %}checked{% endif %}/>
+              <label for="s{{ forloop.counter }}" id="lbl{{ forloop.counter }}">★</label>
+            {% endfor %}
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" name="comment" placeholder="Share your thoughts…" required>{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+      </div>
+    {% else %}
+      <p style="margin-top:1rem;font-size:14px;color:var(--muted)">
+        <a href="/login/" style="color:var(--accent)">Login</a> to leave a review.
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- Related -->
+  {% if related %}
+    <div class="related-section">
+      <h2>You May Also Like</h2>
+      <div class="products-grid">
+        {% for product in related %}
+          {% include 'store/_product_card.html' %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function changeQty(delta) {
+    const input = document.getElementById('qty');
+    const max = parseInt(input.max);
+    input.value = Math.max(1, Math.min(max, parseInt(input.value) + delta));
+  }
+
+  function handleAdd() {
+    const qty = parseInt(document.getElementById('qty').value);
+    addToCart({{ product.id }}, qty);
+  }
+
+  // Star picker
+  document.querySelectorAll('.star-picker label').forEach((lbl, idx) => {
+    lbl.addEventListener('click', () => {
+      document.querySelectorAll('.star-picker label').forEach((l, i) => {
+        l.style.color = i <= idx ? 'var(--accent)' : 'var(--border)';
+      });
+    });
+  });
+
+  // Init selected star
+  const checked = document.querySelector('.star-picker input:checked');
+  if (checked) {
+    const val = parseInt(checked.value);
+    document.querySelectorAll('.star-picker label').forEach((l, i) => {
+      l.style.color = i < val ? 'var(--accent)' : 'var(--border)';
+    });
+  }
+</script>
+{% endblock %}

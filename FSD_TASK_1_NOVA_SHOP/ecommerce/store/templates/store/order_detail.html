@@ -1,0 +1,129 @@
+{% extends 'store/base.html' %}
+{% block title %}Order #{{ order.id }} — NOVA{% endblock %}
+
+{% block extra_head %}
+<style>
+  .order-detail-grid { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; padding: 2rem 0; }
+  .order-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .order-card h3 { font-weight: 700; margin-bottom: 1rem; padding-bottom: .75rem; border-bottom: 1px solid var(--border); }
+  .order-item { display: flex; gap: 1rem; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .order-item:last-child { border-bottom: none; }
+  .order-item img { width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); }
+  .item-info { flex: 1; }
+  .item-name { font-weight: 600; font-size: 14px; }
+  .item-sub { font-size: 12px; color: var(--muted); }
+  .item-price { font-family: var(--font-mono); font-size: 15px; }
+  .info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: var(--muted); }
+  .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+  .status-pending { background: #2b2200; color: #f0a500; }
+  .status-processing { background: #001a2b; color: #4ab8f0; }
+  .status-shipped { background: #0d1a2b; color: #4c9dda; }
+  .status-delivered { background: #0d2b1a; color: #4cda85; }
+  .status-cancelled { background: #2b0d0d; color: #da4c4c; }
+  .success-banner {
+    background: #0d2b1a; border: 1px solid #1e6b3f;
+    border-radius: var(--radius); padding: 1.5rem;
+    margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;
+  }
+  .success-banner i { font-size: 2rem; color: #4cda85; }
+  .success-banner h3 { color: #4cda85; font-size: 1rem; margin-bottom: 4px; }
+  .success-banner p { color: var(--muted); font-size: 13px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Order #{{ order.id }}</h1>
+    <p>Placed on {{ order.created_at|date:"F d, Y \a\t g:i A" }}</p>
+  </div>
+
+  <div class="success-banner">
+    <i class="fas fa-check-circle"></i>
+    <div>
+      <h3>Order Confirmed!</h3>
+      <p>Thank you for your purchase. We'll send you a shipping update soon.</p>
+    </div>
+  </div>
+
+  <div class="order-detail-grid">
+    <div>
+      <!-- Items -->
+      <div class="order-card">
+        <h3>Items Ordered</h3>
+        {% for item in order.items.all %}
+          <div class="order-item">
+            {% if item.product and item.product.display_image %}
+              <img src="{{ item.product.display_image }}" alt="{{ item.product_name }}"/>
+            {% endif %}
+            <div class="item-info">
+              <div class="item-name">{{ item.product_name }}</div>
+              <div class="item-sub">Qty: {{ item.quantity }} × ${{ item.price }}</div>
+            </div>
+            <div class="item-price">${{ item.subtotal }}</div>
+          </div>
+        {% endfor %}
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);text-align:right">
+          <span style="font-family:var(--font-mono);font-size:1.3rem;color:var(--accent)">
+            Total: ${{ order.total_price }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Shipping -->
+      <div class="order-card">
+        <h3>Shipping Address</h3>
+        <p style="color:var(--muted);font-size:14px;line-height:1.8">
+          {{ order.shipping_address }}<br/>
+          {{ order.city }}, {{ order.postal_code }}<br/>
+          {{ order.country }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <div class="order-card">
+        <h3>Order Summary</h3>
+        <div class="info-row">
+          <span class="info-label">Order ID</span>
+          <span>#{{ order.id }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date</span>
+          <span>{{ order.created_at|date:"M d, Y" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Items</span>
+          <span>{{ order.items.count }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Total</span>
+          <span style="font-family:var(--font-mono);color:var(--accent)">${{ order.total_price }}</span>
+        </div>
+        {% if order.phone %}
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span>{{ order.phone }}</span>
+          </div>
+        {% endif %}
+        {% if order.notes %}
+          <div class="info-row" style="flex-direction:column;gap:4px">
+            <span class="info-label">Notes</span>
+            <span style="font-size:13px">{{ order.notes }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <a href="/orders/" class="btn btn-outline" style="width:100%;justify-content:center;margin-bottom:1rem">← Back to Orders</a>
+      <a href="/products/" class="btn btn-primary" style="width:100%;justify-content:center">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

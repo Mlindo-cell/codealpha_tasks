@@ -1,0 +1,36 @@
+{% load static %}
+<div class="product-card">
+  <div class="product-card__img">
+    <a href="{{ product.get_absolute_url }}">
+      {% if product.display_image %}
+        <img src="{{ product.display_image }}" alt="{{ product.name }}" loading="lazy"/>
+      {% else %}
+        <img src="https://via.placeholder.com/400x400/1a1a1a/444?text=No+Image" alt="{{ product.name }}"/>
+      {% endif %}
+    </a>
+    <div class="product-card__badges">
+      {% if product.discount_percent %}<span class="badge badge-sale">-{{ product.discount_percent }}%</span>{% endif %}
+      {% if product.stock == 0 %}<span class="badge badge-oos">Out of Stock</span>{% endif %}
+    </div>
+  </div>
+  <div class="product-card__body">
+    <div class="product-card__cat">{{ product.category.name }}</div>
+    <a href="{{ product.get_absolute_url }}">
+      <div class="product-card__name">{{ product.name }}</div>
+    </a>
+    <div class="product-card__price">
+      <span class="price-current">${{ product.price }}</span>
+      {% if product.original_price %}<span class="price-original">${{ product.original_price }}</span>{% endif %}
+    </div>
+    <div class="product-card__actions">
+      <a href="{{ product.get_absolute_url }}" class="btn btn-outline">Details</a>
+      {% if product.stock > 0 %}
+        <button class="btn btn-primary" onclick="addToCart({{ product.id }})">
+          <i class="fas fa-bag-shopping"></i> Add
+        </button>
+      {% else %}
+        <button class="btn btn-outline" disabled style="opacity:.4;cursor:not-allowed;">Sold Out</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
